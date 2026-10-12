@@ -34,3 +34,8 @@ build/
 
 ### MacOS ###
 .DS_Store
+
+### Env ###
+.env
+.env.prod
+.env.dev
