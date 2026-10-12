@@ -1,10 +1,21 @@
 package com.williameliasson.car_auction_backend.controllers;
 
+import com.williameliasson.car_auction_backend.services.AuthService;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.williameliasson.car_auction_backend.dtos.LoginRequest;
 import com.williameliasson.car_auction_backend.dtos.RegisterRequest;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -12,16 +23,44 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RestController 
 public class AuthController {
     
+    private final SecurityContextRepository securityContextRepository;
+    private final AuthService authService;
+
+    AuthController(AuthService authService, SecurityContextRepository securityContextRepository){
+        this.authService = authService;
+        this.securityContextRepository = securityContextRepository;
+    }
+
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody RegisterRequest registerRequest) {
-        
-        return ;
+    public ResponseEntity<String> register(@RequestBody RegisterRequest registerRequest, HttpServletRequest request, HttpServletResponse response) {    
+        try {
+            Authentication auth = authService.register(registerRequest);
+            SecurityContext context = SecurityContextHolder.createEmptyContext();
+    
+            context.setAuthentication(auth);
+            SecurityContextHolder.setContext(context);
+            securityContextRepository.saveContext(context, request, response);
+            return ResponseEntity.status(HttpStatus.CREATED).build();
+        } catch (Exception e){
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody String entity) {
+    public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest, HttpServletRequest request, HttpServletResponse response) {
 
-        return ;
+      try {
+            // authenticate
+            Authentication auth = authService.login(loginRequest);
+            SecurityContext context = SecurityContextHolder.createEmptyContext();
+
+            context.setAuthentication(auth);
+            SecurityContextHolder.setContext(context);
+            securityContextRepository.saveContext(context, request, response);
+            return ResponseEntity.ok().build();
+        } catch (Exception e){
+            return ResponseEntity.badRequest().build();
+        }
     }
     
 }

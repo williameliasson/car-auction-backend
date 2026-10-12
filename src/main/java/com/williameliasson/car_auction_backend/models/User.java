@@ -17,7 +17,6 @@ import lombok.Setter;
 @Getter 
 @Setter 
 @NoArgsConstructor 
-@AllArgsConstructor 
 @Table (name = "users")
 public class User {
     @Id 
@@ -33,7 +32,8 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    private Integer balance;
+    @Column()
+    private Integer balance = 0;
 
     // later
 
