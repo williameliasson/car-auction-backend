@@ -14,14 +14,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-// the plan
-// Bid
-// user: User
-// createdAt: Instant
-// auction: Auction
-// amount: int
-
-
 @Entity 
 @Getter 
 @Setter 

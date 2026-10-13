@@ -16,24 +16,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-
-// the plan
-// Auction
-// (images: image[]) if i have time
-// owner: User 
-// title: string
-// description: string
-// plate: string
-// deadline: Instant
-// make: Make
-// modelYear: int
-// odometerKm: int
-// valuationMin: int
-// valuationMax: int
-// bids: Bid[]
-// winnerHasPaid: boolean
-
-
 @Entity 
 @Getter 
 @Setter 

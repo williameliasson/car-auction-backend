@@ -35,8 +35,6 @@ public class User {
     @Column()
     private Integer balance = 0;
 
-    // later
-
     // Auctions created by the user
     @OneToMany(mappedBy="owner")
     private List<Auction> auctions;
