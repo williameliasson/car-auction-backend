@@ -42,7 +42,7 @@ public class User {
     private List<Auction> auctions;
 
     // Bids placed by the user
-    // @OneToMany
-    // private List<Bid> bids;
+    @OneToMany(mappedBy="user")
+    private List<Bid> bids;
 
 }

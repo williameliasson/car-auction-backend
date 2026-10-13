@@ -76,8 +76,8 @@ public class Auction {
     @Column(nullable = true)
     private Integer valuationMax;
 
-    // @OneToMany(mappedBy = "uhh")
-    // private List<Bid> bids;
+    @OneToMany(mappedBy = "auction")
+    private List<Bid> bids;
 
     @Column(nullable = false)
     private boolean winnerHasPaid;
