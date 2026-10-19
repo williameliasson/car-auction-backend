@@ -51,4 +51,13 @@ public class AuthService {
             throw new IllegalArgumentException("Incorrect credentials");
         }
     }
+
+    public User getUserByUsername(String username){
+        Optional<User> maybeUser = userRepository.findByUsername(username);
+        if (maybeUser.isPresent()){
+            return maybeUser.get();
+        } else {
+            throw new IllegalArgumentException("No user found");
+        }
+    }
 }
