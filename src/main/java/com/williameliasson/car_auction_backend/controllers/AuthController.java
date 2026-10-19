@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.williameliasson.car_auction_backend.dtos.LoginRequest;
 import com.williameliasson.car_auction_backend.dtos.RegisterRequest;
+import com.williameliasson.car_auction_backend.dtos.UserDTO;
+import com.williameliasson.car_auction_backend.models.User;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +20,8 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.GetMapping;
+
 
 
 @RestController 
@@ -62,5 +66,18 @@ public class AuthController {
             return ResponseEntity.badRequest().build();
         }
     }
+
+    @GetMapping("/me")
+    public ResponseEntity<UserDTO> getCurrentUser(Authentication authentication) {
+        if (authentication == null) return ResponseEntity.badRequest().build();
+        try {
+            User user = authService.getUserByUsername(authentication.getName());
+            return ResponseEntity.ok().body(new UserDTO(user.getUsername(), user.getEmail()));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+        
+    }
+    
     
 }
