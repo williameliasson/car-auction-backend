@@ -60,6 +60,7 @@ public class AuctionController {
         auctionDisplays = auctions.stream()
             .map(auction -> 
                 new AuctionDisplay(
+                    auction.getId(),
                     auction.getTitle(),
                     auction.getDescription(),
                     auction.getPlate(),
@@ -78,6 +79,7 @@ public class AuctionController {
     public ResponseEntity<AuctionDisplay> getById(@PathVariable int id) {
         Auction auction = auctionService.getAuctionById(id);
         AuctionDisplay auctionDisplay = new AuctionDisplay(
+                    auction.getId(),
                     auction.getTitle(),
                     auction.getDescription(),
                     auction.getPlate(),

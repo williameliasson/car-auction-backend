@@ -3,6 +3,7 @@ package com.williameliasson.car_auction_backend.dtos;
 import java.time.Instant;
 
 public record AuctionDisplay(
+    Integer id,
     String title,
     String description,
     String plate,
