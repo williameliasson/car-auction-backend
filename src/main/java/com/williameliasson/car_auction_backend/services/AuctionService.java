@@ -8,6 +8,7 @@ import com.williameliasson.car_auction_backend.repositories.AuctionRepository;
 
 import com.williameliasson.car_auction_backend.repositories.CarMakeRepository;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -47,5 +48,13 @@ public class AuctionService {
 
     public List<Auction> getAllAuctions(){
         return auctionRepository.findAll();
+    }
+
+    public Auction getAuctionById(int id){
+        Optional<Auction> maybeAuction = auctionRepository.findById(id);
+        if (!maybeAuction.isPresent()){
+            throw new IllegalArgumentException("Auction not found");
+        }
+        return maybeAuction.get();
     }
 }
