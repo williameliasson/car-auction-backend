@@ -18,9 +18,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+
 
 
 
@@ -71,6 +73,23 @@ public class AuctionController {
             .toList();
         return auctionDisplays;
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<AuctionDisplay> getById(@PathVariable int id) {
+        Auction auction = auctionService.getAuctionById(id);
+        AuctionDisplay auctionDisplay = new AuctionDisplay(
+                    auction.getTitle(),
+                    auction.getDescription(),
+                    auction.getPlate(),
+                    auction.getDeadline(),
+                    // auction.getMakeId()
+                    auction.getMake().getName(),
+                    auction.getModelYear(),
+                    auction.getOdometerKm()
+                );
+        return ResponseEntity.ok().body(auctionDisplay);
+    }
+    
 
     //u
 
