@@ -7,6 +7,8 @@ import com.williameliasson.car_auction_backend.models.User;
 import com.williameliasson.car_auction_backend.services.AuctionService;
 import com.williameliasson.car_auction_backend.services.AuthService;
 
+import jakarta.validation.Valid;
+
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
@@ -37,7 +39,7 @@ public class AuctionController {
     
     //c
     @PostMapping("")
-    public ResponseEntity<Void> createAuction(@RequestBody AuctionCreateRequest auctionCreateRequest, Authentication authentication) {
+    public ResponseEntity<Void> createAuction(@Valid @RequestBody AuctionCreateRequest auctionCreateRequest, Authentication authentication) {
         try {
             User user = authService.getUserByUsername(authentication.getName());
             auctionService.createAuction(user, auctionCreateRequest);
