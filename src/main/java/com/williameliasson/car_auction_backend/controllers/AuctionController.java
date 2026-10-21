@@ -57,12 +57,15 @@ public class AuctionController {
                 auction.getDescription(),
                 auction.getPlate(),
                 auction.getDeadline(),
-                "Volvo temp temp",
+                auction.getMake().getName(),
                 auction.getModelYear(),
-                auction.getOdometerKm()
+                auction.getOdometerKm(),
+                auction.getValuationMin(),
+                auction.getValuationMax()
             );
             return ResponseEntity.status(HttpStatus.CREATED).body(auctionDisplay);
         } catch (Exception e) {
+            System.err.println(e);
             return ResponseEntity.badRequest().build();
         }
     }
@@ -84,7 +87,9 @@ public class AuctionController {
                     // auction.getMakeId()
                     auction.getMake().getName(),
                     auction.getModelYear(),
-                    auction.getOdometerKm()
+                    auction.getOdometerKm(),
+                    auction.getValuationMin(),
+                    auction.getValuationMax()
                 )
             )
             .toList();
@@ -103,7 +108,9 @@ public class AuctionController {
                     // auction.getMakeId()
                     auction.getMake().getName(),
                     auction.getModelYear(),
-                    auction.getOdometerKm()
+                    auction.getOdometerKm(),
+                    auction.getValuationMin(),
+                    auction.getValuationMax()
                 );
         return ResponseEntity.ok().body(auctionDisplay);
     }

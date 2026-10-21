@@ -69,7 +69,7 @@ public class OpenAIService {
         ObjectMapper objectMapper = new ObjectMapper();
         String requestString = objectMapper.writeValueAsString(request);
 
-        HttpEntity<String> requestEntity = new HttpEntity<String>(requestString);
+        HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(request);
                 
         // make the post request
         JsonNode response = restTemplate.postForObject(apiUrl, requestEntity, JsonNode.class);
