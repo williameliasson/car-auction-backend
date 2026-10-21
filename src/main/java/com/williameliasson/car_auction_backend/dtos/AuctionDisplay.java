@@ -11,7 +11,9 @@ public record AuctionDisplay(
     // Integer make_id,
     String makeName,
     Integer modelYear,
-    Integer odometerKm
+    Integer odometerKm,
     // bids list?
+    Integer valuationMin,
+    Integer valuationMax
 ) {
 }

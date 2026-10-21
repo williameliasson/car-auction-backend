@@ -1,7 +1,7 @@
 package com.williameliasson.car_auction_backend.services;
 
-import com.williameliasson.car_auction_backend.controllers.AuctionController;
 import com.williameliasson.car_auction_backend.dtos.AuctionCreateRequest;
+import com.williameliasson.car_auction_backend.dtos.ValuationResult;
 import com.williameliasson.car_auction_backend.models.Auction;
 import com.williameliasson.car_auction_backend.models.CarMake;
 import com.williameliasson.car_auction_backend.models.User;
@@ -15,12 +15,14 @@ import org.springframework.stereotype.Service;
 
 @Service 
 public class AuctionService {
+    private final OpenAIService openAIService;
     private final CarMakeService carMakeService;
     private final AuctionRepository auctionRepository;
 
-    AuctionService(AuctionRepository auctionRepository, CarMakeRepository carMakeRepository, CarMakeService carMakeService){
+    AuctionService(AuctionRepository auctionRepository, CarMakeRepository carMakeRepository, CarMakeService carMakeService, OpenAIService openAIService){
         this.auctionRepository = auctionRepository;
         this.carMakeService = carMakeService;
+        this.openAIService = openAIService;
     }
 
     public Auction createAuction(User user, AuctionCreateRequest auctionCreateRequest){
@@ -37,9 +39,9 @@ public class AuctionService {
 
         auction.setModelYear(auctionCreateRequest.modelYear());
         
-        // Todo: add openai request result here. replace the nulls
-        auction.setValuationMin(null);
-        auction.setValuationMax(null);
+        ValuationResult valuationResult = openAIService.getValuation(auction);
+        auction.setValuationMin(valuationResult.valuationMin());
+        auction.setValuationMax(valuationResult.valuationMax());
 
         auction.setWinnerHasPaid(false);
         auction.setOdometerKm(auctionCreateRequest.odometerKm());
