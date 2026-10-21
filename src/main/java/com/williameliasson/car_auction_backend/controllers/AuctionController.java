@@ -41,11 +41,21 @@ public class AuctionController {
     
     //c
     @PostMapping("")
-    public ResponseEntity<Void> createAuction(@Valid @RequestBody AuctionCreateRequest auctionCreateRequest, Authentication authentication) {
+    public ResponseEntity<AuctionDisplay> createAuction(@Valid @RequestBody AuctionCreateRequest auctionCreateRequest, Authentication authentication) {
         try {
             User user = authService.getUserByUsername(authentication.getName());
-            auctionService.createAuction(user, auctionCreateRequest);
-            return ResponseEntity.status(HttpStatus.CREATED).build();
+            Auction auction = auctionService.createAuction(user, auctionCreateRequest);
+            AuctionDisplay auctionDisplay = new AuctionDisplay(
+                auction.getId(),
+                auction.getTitle(),
+                auction.getDescription(),
+                auction.getPlate(),
+                auction.getDeadline(),
+                "Volvo temp temp",
+                auction.getModelYear(),
+                auction.getOdometerKm()
+            );
+            return ResponseEntity.status(HttpStatus.CREATED).body(auctionDisplay);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }

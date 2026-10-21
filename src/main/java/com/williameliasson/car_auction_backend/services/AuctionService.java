@@ -1,5 +1,6 @@
 package com.williameliasson.car_auction_backend.services;
 
+import com.williameliasson.car_auction_backend.controllers.AuctionController;
 import com.williameliasson.car_auction_backend.dtos.AuctionCreateRequest;
 import com.williameliasson.car_auction_backend.models.Auction;
 import com.williameliasson.car_auction_backend.models.CarMake;
@@ -22,7 +23,7 @@ public class AuctionService {
         this.carMakeService = carMakeService;
     }
 
-    public void createAuction(User user, AuctionCreateRequest auctionCreateRequest){
+    public Auction createAuction(User user, AuctionCreateRequest auctionCreateRequest){
         Auction auction = new Auction();
         
         auction.setOwner(user);
@@ -41,9 +42,10 @@ public class AuctionService {
         auction.setValuationMax(null);
 
         auction.setWinnerHasPaid(false);
-        auction.setOdometerKm(auction.getOdometerKm());
+        auction.setOdometerKm(auctionCreateRequest.odometerKm());
 
         auctionRepository.save(auction);
+        return auction;
     }
 
     public List<Auction> getAllAuctions(){

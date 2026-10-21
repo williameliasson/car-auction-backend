@@ -38,6 +38,7 @@ public class SecurityConfig {
             .authorizeHttpRequests((requests) -> requests
                 .requestMatchers("/login", "/register").permitAll()
                 .requestMatchers("/auctions", "/auctions/**").permitAll()
+                .requestMatchers("/carmakes").permitAll()
                 .anyRequest().authenticated())
             .userDetailsService(customUserDetailsService);
 
