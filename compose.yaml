@@ -20,6 +20,8 @@ services:
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
       FRONTEND_URL: ${FRONTEND_URL}
       SESSION_COOKIE_SECURE: ${SESSION_COOKIE_SECURE}
+      OPENAI_KEY: ${OPENAI_KEY}
+      OPENAI_URL: ${OPENAI_URL}
     depends_on:
       - postgres
 

@@ -2,11 +2,13 @@ package com.williameliasson.car_auction_backend.controllers;
 
 import com.williameliasson.car_auction_backend.dtos.AuctionCreateRequest;
 import com.williameliasson.car_auction_backend.dtos.AuctionDisplay;
+import com.williameliasson.car_auction_backend.dtos.ValuationResult;
 import com.williameliasson.car_auction_backend.models.Auction;
 import com.williameliasson.car_auction_backend.models.User;
 import com.williameliasson.car_auction_backend.services.AuctionService;
 import com.williameliasson.car_auction_backend.services.AuthService;
 
+import com.williameliasson.car_auction_backend.services.OpenAIService;
 import jakarta.validation.Valid;
 
 import org.springframework.web.bind.annotation.RestController;
@@ -22,6 +24,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 
 
@@ -29,13 +33,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RestController 
 @RequestMapping("/auctions")
 public class AuctionController {
+    private final OpenAIService openAIService;
     private final AuthService authService;
     private final AuctionService auctionService;
 
     
-    AuctionController(AuctionService auctionService, AuthService authService) {
+    AuctionController(AuctionService auctionService, AuthService authService, OpenAIService openAIService) {
         this.auctionService = auctionService;
         this.authService = authService;
+        this.openAIService = openAIService;
         
     }
     
@@ -101,6 +107,13 @@ public class AuctionController {
                 );
         return ResponseEntity.ok().body(auctionDisplay);
     }
+
+    @GetMapping("/{id}/valuation")
+    public ResponseEntity<ValuationResult> getValuation(@PathVariable int id) {
+        Auction auction = auctionService.getAuctionById(id);
+        return ResponseEntity.ok().body(openAIService.getValuation(auction));
+    }
+    
     
 
     //u
