@@ -3,6 +3,7 @@ package com.williameliasson.car_auction_backend.services;
 import com.williameliasson.car_auction_backend.dtos.AuctionCreateRequest;
 import com.williameliasson.car_auction_backend.dtos.ValuationResult;
 import com.williameliasson.car_auction_backend.models.Auction;
+import com.williameliasson.car_auction_backend.models.Bid;
 import com.williameliasson.car_auction_backend.models.CarMake;
 import com.williameliasson.car_auction_backend.models.User;
 import com.williameliasson.car_auction_backend.repositories.AuctionRepository;

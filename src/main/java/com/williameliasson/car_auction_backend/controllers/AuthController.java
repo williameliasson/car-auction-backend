@@ -72,7 +72,7 @@ public class AuthController {
         if (authentication == null) return ResponseEntity.badRequest().build();
         try {
             User user = authService.getUserByUsername(authentication.getName());
-            return ResponseEntity.ok().body(new UserDTO(user.getUsername(), user.getEmail()));
+            return ResponseEntity.ok().body(new UserDTO(user.getUsername(), user.getEmail(), user.getBalance(), -1));
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }

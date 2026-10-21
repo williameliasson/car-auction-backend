@@ -2,6 +2,8 @@ package com.williameliasson.car_auction_backend.controllers;
 
 import com.williameliasson.car_auction_backend.dtos.AuctionCreateRequest;
 import com.williameliasson.car_auction_backend.dtos.AuctionDisplay;
+import com.williameliasson.car_auction_backend.dtos.BidCreateRequest;
+import com.williameliasson.car_auction_backend.dtos.BidDisplay;
 import com.williameliasson.car_auction_backend.dtos.ValuationResult;
 import com.williameliasson.car_auction_backend.models.Auction;
 import com.williameliasson.car_auction_backend.models.User;
@@ -121,6 +123,17 @@ public class AuctionController {
         return ResponseEntity.ok().body(openAIService.getValuation(auction));
     }
     
+    
+    @PostMapping("/{id}/bids")
+    public ResponseEntity<BidDisplay> createBid(@PathVariable int id, @RequestBody BidCreateRequest bidCreateRequest, Authentication authentication) {
+        try {
+            
+            return ResponseEntity.status(HttpStatus.CREATED).build();
+        } catch (Exception e){
+
+            return ResponseEntity.badRequest().build();
+        }
+    }
     
 
     //u

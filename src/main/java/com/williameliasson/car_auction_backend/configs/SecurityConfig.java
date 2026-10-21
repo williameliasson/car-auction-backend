@@ -37,7 +37,7 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .authorizeHttpRequests((requests) -> requests
                 .requestMatchers("/login", "/register").permitAll()
-                .requestMatchers("/auctions", "/auctions/**").permitAll()
+                .requestMatchers("/auctions", "/auctions/*").permitAll()
                 .requestMatchers("/carmakes").permitAll()
                 .anyRequest().authenticated())
             .userDetailsService(customUserDetailsService);
