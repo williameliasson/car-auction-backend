@@ -10,6 +10,7 @@ import com.williameliasson.car_auction_backend.models.User;
 import com.williameliasson.car_auction_backend.services.AuctionService;
 import com.williameliasson.car_auction_backend.services.AuthService;
 
+import com.williameliasson.car_auction_backend.services.BidService;
 import com.williameliasson.car_auction_backend.services.OpenAIService;
 import jakarta.validation.Valid;
 
@@ -35,15 +36,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RestController 
 @RequestMapping("/auctions")
 public class AuctionController {
+    private final BidService bidService;
     private final OpenAIService openAIService;
     private final AuthService authService;
     private final AuctionService auctionService;
 
     
-    AuctionController(AuctionService auctionService, AuthService authService, OpenAIService openAIService) {
+    AuctionController(AuctionService auctionService, AuthService authService, OpenAIService openAIService, BidService bidService) {
         this.auctionService = auctionService;
         this.authService = authService;
         this.openAIService = openAIService;
+        this.bidService = bidService;
         
     }
     
@@ -124,13 +127,14 @@ public class AuctionController {
     }
     
     
-    @PostMapping("/{id}/bids")
-    public ResponseEntity<BidDisplay> createBid(@PathVariable int id, @RequestBody BidCreateRequest bidCreateRequest, Authentication authentication) {
+    @PostMapping("/{auctionId}/bids")
+    public ResponseEntity<BidDisplay> createBid(@PathVariable int auctionId, @RequestBody BidCreateRequest bidCreateRequest, Authentication authentication) {
         try {
-            
+            User user = authService.getUserByUsername(authentication.getName());
+            bidService.createBid(user, bidCreateRequest.amount(), auctionId);
             return ResponseEntity.status(HttpStatus.CREATED).build();
         } catch (Exception e){
-
+            System.err.println(e);
             return ResponseEntity.badRequest().build();
         }
     }

@@ -1,7 +1,13 @@
 package com.williameliasson.car_auction_backend.services;
 
+import com.williameliasson.car_auction_backend.repositories.BidRepository;
+
+import jakarta.transaction.Transactional;
+
 import java.time.Instant;
 import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -12,16 +18,22 @@ import com.williameliasson.car_auction_backend.models.User;
 @Service 
 public class BidService {
     
+    private final BidRepository bidRepository;
     private final AuctionService auctionService;
 
-    BidService(AuctionService auctionService){
+    BidService(AuctionService auctionService, BidRepository bidRepository){
         this.auctionService = auctionService;
+        this.bidRepository = bidRepository;
     }
 
+    @Transactional 
     public void createBid(User user, Integer amount, Integer auctionId){
         
         Auction auction = auctionService.getAuctionById(auctionId);
+        Optional<Bid> highestBid = getHighestBid(auctionId);
         
+        // Run all checks
+
         // check if user is the owner of the auction
         if (auction.getOwner().equals(user)){
             throw new IllegalArgumentException("Cannot bid on your own auction");
@@ -37,28 +49,67 @@ public class BidService {
             throw new IllegalArgumentException("Cannot bid on finished auction, winner has already paid");
         }
 
+        // check the amount being positive nonzero
+        if (amount <= 0){
+            throw new IllegalArgumentException("Bid amount must be greater than 0");
+        }
+
+        // check amount being greater than the current highest bid
+        if (highestBid.isPresent() && amount <= highestBid.get().getAmount()){
+            throw new IllegalArgumentException("Bid amount must be larger than current highest bid");
+        }
+
+
+
         // check if user has available balance greather than or equal to the requested amount to bid
         
-
-
-
-
         // Unsure about this check
-        // if (getHighestBid(auctionId).getUser().equals(user)){
+        // if (highestBid.getUser().equals(user)){
         //     throw new IllegalArgumentException("Cannot outbid yourself");
         // }
 
+        // Create the Bid object and persist it
+        Bid bid = new Bid();
+        bid.setUser(user);
+        bid.setAuction(auction);
+        bid.setAmount(amount);
+        bid.setCreatedAt(Instant.now());
+        bidRepository.save(bid);
     }
 
-    public Bid getHighestBid(Integer auctionId){
+    public Optional<Bid> getHighestBid(Integer auctionId){
         Auction auction = auctionService.getAuctionById(auctionId);
         
         // src: https://www.geeksforgeeks.org/java/stream-max-method-java-examples/
         // get highest bid
-        Bid highestBid = auction.getBids().stream()
-            .max(Comparator.comparing(bid -> bid.getAmount()))
-            .get();
+        Optional<Bid> highestBid = auction.getBids().stream()
+            .max(Comparator.comparing(bid -> bid.getAmount()));
         return highestBid;
 
+    }
+
+    // get list of bids that User user has placed, on ongoing auctions, where User user has the currently highest bid
+    public List<Bid> getActiveHighestBids(User user){
+        List<Bid> bids = bidRepository.findAllByUser(user);
+        bids = bids.stream()
+            .filter(bid -> {
+                Auction auction = bid.getAuction();
+                Optional<Bid> highestBid = getHighestBid(auction.getId());
+                if (auction.isWinnerHasPaid() || // winner already paid
+                    (highestBid.isPresent() && !highestBid.get().equals(bid) ) // a highest bid even exists AND this bid is not it
+                    // auction.getDeadline().isBefore(Instant.now()) // past deadline
+                ){
+                    return false;
+                }
+                return true;
+            }
+            )
+            .toList();
+        return bids;
+    }
+
+    public Integer getAvailableBalance(User user){
+        Integer lockedBalance = getActiveHighestBids(user).stream().mapToInt(bid -> bid.getAmount()).sum();
+        return user.getBalance() - lockedBalance;
     }
 }

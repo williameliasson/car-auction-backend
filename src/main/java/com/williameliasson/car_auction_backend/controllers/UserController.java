@@ -34,7 +34,7 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.CREATED).build();
         } catch (Exception e) {
             System.err.println(e);
-            return ResponseEntity.badRequest().body("hey!");
+            return ResponseEntity.badRequest().build();
         }
 
     }
