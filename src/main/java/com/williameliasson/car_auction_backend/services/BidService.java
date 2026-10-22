@@ -7,6 +7,7 @@ import jakarta.transaction.Transactional;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -113,5 +114,14 @@ public class BidService {
     public Integer getAvailableBalance(User user){
         Integer lockedBalance = getActiveHighestBids(user).stream().mapToInt(bid -> bid.getAmount()).sum();
         return user.getBalance() - lockedBalance;
+    }
+
+    public String getBidderHash(Bid bid){
+        String auctionId = bid.getAuction().getId().toString();
+        String userId = bid.getUser().getId().toString();
+
+        // src: https://www.baeldung.com/java-objects-hash-vs-objects-hashcode
+        String hash = String.valueOf(Objects.hash(auctionId + "-" + userId));
+        return hash;
     }
 }
