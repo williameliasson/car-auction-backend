@@ -33,16 +33,18 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RestController 
 @RequestMapping("/auctions")
 public class AuctionController {
+    private final AuctionMapper auctionMapper;
     private final BidService bidService;
     private final OpenAIService openAIService;
     private final AuthService authService;
     private final AuctionService auctionService;
  
-    AuctionController(AuctionService auctionService, AuthService authService, OpenAIService openAIService, BidService bidService) {
+    AuctionController(AuctionService auctionService, AuthService authService, OpenAIService openAIService, BidService bidService, AuctionMapper auctionMapper) {
         this.auctionService = auctionService;
         this.authService = authService;
         this.openAIService = openAIService;
         this.bidService = bidService;
+        this.auctionMapper = auctionMapper;
     }
     
     //c
@@ -52,7 +54,7 @@ public class AuctionController {
             User user = authService.getUserByUsername(authentication.getName());
             Auction auction = auctionService.createAuction(user, auctionCreateRequest);
             
-            AuctionDisplay auctionDisplay = AuctionMapper.toAuctionDisplay(auction, user);
+            AuctionDisplay auctionDisplay = auctionMapper.toAuctionDisplay(auction, user);
             return ResponseEntity.status(HttpStatus.CREATED).body(auctionDisplay);
         } catch (Exception e) {
             System.err.println(e);
@@ -71,7 +73,7 @@ public class AuctionController {
         User user = authentication == null ? null : authService.getUserByUsername(authentication.getName());
 
         auctionDisplays = auctions.stream()
-            .map(auction -> AuctionMapper.toAuctionDisplay(auction, user))
+            .map(auction -> auctionMapper.toAuctionDisplay(auction, user))
             .toList();
         return auctionDisplays;
     }
@@ -81,7 +83,7 @@ public class AuctionController {
         User user = authentication == null ? null : authService.getUserByUsername(authentication.getName());
         Auction auction = auctionService.getAuctionById(id);
         
-        AuctionDisplay auctionDisplay = AuctionMapper.toAuctionDisplay(auction, user);
+        AuctionDisplay auctionDisplay = auctionMapper.toAuctionDisplay(auction, user);
         return ResponseEntity.ok().body(auctionDisplay);
     }
 

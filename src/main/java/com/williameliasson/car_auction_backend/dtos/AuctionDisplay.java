@@ -1,6 +1,7 @@
 package com.williameliasson.car_auction_backend.dtos;
 
 import java.time.Instant;
+import java.util.List;
 
 public record AuctionDisplay(
     Integer id,
@@ -12,9 +13,9 @@ public record AuctionDisplay(
     String makeName,
     Integer modelYear,
     Integer odometerKm,
-    // bids list?
     Integer valuationMin,
     Integer valuationMax,
-    boolean requestingUserIsOwner
+    boolean requestingUserIsOwner,
+    List<BidDisplay> bids
 ) {
 }
