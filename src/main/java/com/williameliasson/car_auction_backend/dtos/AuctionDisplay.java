@@ -14,6 +14,7 @@ public record AuctionDisplay(
     Integer odometerKm,
     // bids list?
     Integer valuationMin,
-    Integer valuationMax
+    Integer valuationMax,
+    boolean requestingUserIsOwner
 ) {
 }

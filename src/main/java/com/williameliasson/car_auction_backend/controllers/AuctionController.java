@@ -66,7 +66,8 @@ public class AuctionController {
                 auction.getModelYear(),
                 auction.getOdometerKm(),
                 auction.getValuationMin(),
-                auction.getValuationMax()
+                auction.getValuationMax(),
+                true
             );
             return ResponseEntity.status(HttpStatus.CREATED).body(auctionDisplay);
         } catch (Exception e) {
@@ -78,9 +79,14 @@ public class AuctionController {
 
     //r
     @GetMapping("")
-    public List<AuctionDisplay> getAllAuctions() {
+    public List<AuctionDisplay> getAllAuctions(Authentication authentication) {
         List<Auction> auctions = auctionService.getAllAuctions();
         List<AuctionDisplay> auctionDisplays = new ArrayList<>();
+        
+        // being authenticated is optional, but gives additional info. in this case, whether the authed user is the owner of any auction
+        // if the user is logged in, set the User user variable to the current user. Otherwise, set it to null.
+        User user = authentication == null ? null : authService.getUserByUsername(authentication.getName());
+
         auctionDisplays = auctions.stream()
             .map(auction -> 
                 new AuctionDisplay(
@@ -94,7 +100,8 @@ public class AuctionController {
                     auction.getModelYear(),
                     auction.getOdometerKm(),
                     auction.getValuationMin(),
-                    auction.getValuationMax()
+                    auction.getValuationMax(),
+                    user == null ? false : auction.getOwner().equals(user) // if the user isnt logged in, default to showing it as not owned by the user. Otherwise, perform a check to see if the user is owner of this auction.
                 )
             )
             .toList();
@@ -102,7 +109,8 @@ public class AuctionController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<AuctionDisplay> getById(@PathVariable int id) {
+    public ResponseEntity<AuctionDisplay> getById(@PathVariable int id, Authentication authentication) {
+        User user = authentication == null ? null : authService.getUserByUsername(authentication.getName());
         Auction auction = auctionService.getAuctionById(id);
         AuctionDisplay auctionDisplay = new AuctionDisplay(
                     auction.getId(),
@@ -115,7 +123,8 @@ public class AuctionController {
                     auction.getModelYear(),
                     auction.getOdometerKm(),
                     auction.getValuationMin(),
-                    auction.getValuationMax()
+                    auction.getValuationMax(),
+                    user == null ? false : auction.getOwner().equals(user) // if the user isnt logged in, default to showing it as not owned by the user. Otherwise, perform a check to see if the user is owner of this auction.
                 );
         return ResponseEntity.ok().body(auctionDisplay);
     }

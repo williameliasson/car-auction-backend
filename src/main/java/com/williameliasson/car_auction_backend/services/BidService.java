@@ -59,14 +59,16 @@ public class BidService {
             throw new IllegalArgumentException("Bid amount must be larger than current highest bid");
         }
 
-
-
-        // check if user has available balance greather than or equal to the requested amount to bid
+        // check if user has available balance to the requested amount to bid
+        if (getAvailableBalance(user) - amount < 0){
+            throw new IllegalArgumentException("Cannot bid more than your total available balance");
+        }
         
-        // Unsure about this check
-        // if (highestBid.getUser().equals(user)){
-        //     throw new IllegalArgumentException("Cannot outbid yourself");
-        // }
+        // Unsure about this check. Having it included simplifies the situation where the user wants to outbid oneself,
+        // as you would need to have a separate method for getting the available balance for each combination of user and auction.
+        if (highestBid.isPresent() && highestBid.get().getUser().equals(user)){
+            throw new IllegalArgumentException("Cannot outbid yourself");
+        }
 
         // Create the Bid object and persist it
         Bid bid = new Bid();
