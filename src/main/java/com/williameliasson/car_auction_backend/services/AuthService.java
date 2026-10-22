@@ -1,6 +1,9 @@
 package com.williameliasson.car_auction_backend.services;
 
 import com.williameliasson.car_auction_backend.repositories.UserRepository;
+
+import jakarta.transaction.Transactional;
+
 import java.util.Optional;
 
 import org.springframework.security.authentication.AuthenticationManager;
@@ -59,5 +62,11 @@ public class AuthService {
         } else {
             throw new IllegalArgumentException("No user found");
         }
+    }
+
+    @Transactional 
+    public void rewardUserBalance(String username, Integer rewardAmount){
+        User user = getUserByUsername(username);
+        user.setBalance(user.getBalance() + rewardAmount);
     }
 }

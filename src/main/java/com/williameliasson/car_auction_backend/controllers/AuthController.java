@@ -2,6 +2,7 @@ package com.williameliasson.car_auction_backend.controllers;
 
 import com.williameliasson.car_auction_backend.services.AuthService;
 
+import com.williameliasson.car_auction_backend.services.BidService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -27,12 +28,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 @RestController 
 public class AuthController {
     
+    private final BidService bidService;
     private final SecurityContextRepository securityContextRepository;
     private final AuthService authService;
 
-    AuthController(AuthService authService, SecurityContextRepository securityContextRepository){
+    AuthController(AuthService authService, SecurityContextRepository securityContextRepository, BidService bidService){
         this.authService = authService;
         this.securityContextRepository = securityContextRepository;
+        this.bidService = bidService;
     }
 
     @PostMapping("/register")
@@ -72,7 +75,7 @@ public class AuthController {
         if (authentication == null) return ResponseEntity.badRequest().build();
         try {
             User user = authService.getUserByUsername(authentication.getName());
-            return ResponseEntity.ok().body(new UserDTO(user.getUsername(), user.getEmail()));
+            return ResponseEntity.ok().body(new UserDTO(user.getUsername(), user.getEmail(), user.getBalance(), bidService.getAvailableBalance(user)));
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
