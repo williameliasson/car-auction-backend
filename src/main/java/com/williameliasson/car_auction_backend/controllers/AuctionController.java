@@ -5,6 +5,7 @@ import com.williameliasson.car_auction_backend.dtos.AuctionDisplay;
 import com.williameliasson.car_auction_backend.dtos.BidCreateRequest;
 import com.williameliasson.car_auction_backend.dtos.BidDisplay;
 import com.williameliasson.car_auction_backend.dtos.ValuationResult;
+import com.williameliasson.car_auction_backend.mappers.AuctionMapper;
 import com.williameliasson.car_auction_backend.models.Auction;
 import com.williameliasson.car_auction_backend.models.User;
 import com.williameliasson.car_auction_backend.services.AuctionService;
@@ -27,10 +28,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-
-
-
 
 
 @RestController 
@@ -40,14 +37,12 @@ public class AuctionController {
     private final OpenAIService openAIService;
     private final AuthService authService;
     private final AuctionService auctionService;
-
-    
+ 
     AuctionController(AuctionService auctionService, AuthService authService, OpenAIService openAIService, BidService bidService) {
         this.auctionService = auctionService;
         this.authService = authService;
         this.openAIService = openAIService;
         this.bidService = bidService;
-        
     }
     
     //c
@@ -56,19 +51,8 @@ public class AuctionController {
         try {
             User user = authService.getUserByUsername(authentication.getName());
             Auction auction = auctionService.createAuction(user, auctionCreateRequest);
-            AuctionDisplay auctionDisplay = new AuctionDisplay(
-                auction.getId(),
-                auction.getTitle(),
-                auction.getDescription(),
-                auction.getPlate(),
-                auction.getDeadline(),
-                auction.getMake().getName(),
-                auction.getModelYear(),
-                auction.getOdometerKm(),
-                auction.getValuationMin(),
-                auction.getValuationMax(),
-                true
-            );
+            
+            AuctionDisplay auctionDisplay = AuctionMapper.toAuctionDisplay(auction, user);
             return ResponseEntity.status(HttpStatus.CREATED).body(auctionDisplay);
         } catch (Exception e) {
             System.err.println(e);
@@ -76,7 +60,6 @@ public class AuctionController {
         }
     }
     
-
     //r
     @GetMapping("")
     public List<AuctionDisplay> getAllAuctions(Authentication authentication) {
@@ -88,22 +71,7 @@ public class AuctionController {
         User user = authentication == null ? null : authService.getUserByUsername(authentication.getName());
 
         auctionDisplays = auctions.stream()
-            .map(auction -> 
-                new AuctionDisplay(
-                    auction.getId(),
-                    auction.getTitle(),
-                    auction.getDescription(),
-                    auction.getPlate(),
-                    auction.getDeadline(),
-                    // auction.getMakeId()
-                    auction.getMake().getName(),
-                    auction.getModelYear(),
-                    auction.getOdometerKm(),
-                    auction.getValuationMin(),
-                    auction.getValuationMax(),
-                    user == null ? false : auction.getOwner().equals(user) // if the user isnt logged in, default to showing it as not owned by the user. Otherwise, perform a check to see if the user is owner of this auction.
-                )
-            )
+            .map(auction -> AuctionMapper.toAuctionDisplay(auction, user))
             .toList();
         return auctionDisplays;
     }
@@ -112,20 +80,8 @@ public class AuctionController {
     public ResponseEntity<AuctionDisplay> getById(@PathVariable int id, Authentication authentication) {
         User user = authentication == null ? null : authService.getUserByUsername(authentication.getName());
         Auction auction = auctionService.getAuctionById(id);
-        AuctionDisplay auctionDisplay = new AuctionDisplay(
-                    auction.getId(),
-                    auction.getTitle(),
-                    auction.getDescription(),
-                    auction.getPlate(),
-                    auction.getDeadline(),
-                    // auction.getMakeId()
-                    auction.getMake().getName(),
-                    auction.getModelYear(),
-                    auction.getOdometerKm(),
-                    auction.getValuationMin(),
-                    auction.getValuationMax(),
-                    user == null ? false : auction.getOwner().equals(user) // if the user isnt logged in, default to showing it as not owned by the user. Otherwise, perform a check to see if the user is owner of this auction.
-                );
+        
+        AuctionDisplay auctionDisplay = AuctionMapper.toAuctionDisplay(auction, user);
         return ResponseEntity.ok().body(auctionDisplay);
     }
 
@@ -134,7 +90,6 @@ public class AuctionController {
         Auction auction = auctionService.getAuctionById(id);
         return ResponseEntity.ok().body(openAIService.getValuation(auction));
     }
-    
     
     @PostMapping("/{auctionId}/bids")
     public ResponseEntity<BidDisplay> createBid(@PathVariable int auctionId, @RequestBody BidCreateRequest bidCreateRequest, Authentication authentication) {
