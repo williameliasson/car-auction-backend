@@ -1,11 +1,8 @@
 package com.williameliasson.car_auction_backend.controllers;
 
 import com.williameliasson.car_auction_backend.dtos.UserRewardRequest;
-import com.williameliasson.car_auction_backend.models.User;
-import com.williameliasson.car_auction_backend.repositories.UserRepository;
 import com.williameliasson.car_auction_backend.services.AuthService;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

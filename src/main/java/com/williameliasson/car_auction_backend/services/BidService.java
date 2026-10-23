@@ -8,7 +8,6 @@ import jakarta.transaction.Transactional;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 import org.springframework.messaging.simp.SimpMessagingTemplate;

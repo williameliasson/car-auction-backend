@@ -2,8 +2,6 @@ package com.williameliasson.car_auction_backend.controllers;
 
 import com.williameliasson.car_auction_backend.dtos.AuctionCreateRequest;
 import com.williameliasson.car_auction_backend.dtos.AuctionDisplay;
-import com.williameliasson.car_auction_backend.dtos.BidCreateRequest;
-import com.williameliasson.car_auction_backend.dtos.BidDisplay;
 import com.williameliasson.car_auction_backend.dtos.ValuationResult;
 import com.williameliasson.car_auction_backend.mappers.AuctionMapper;
 import com.williameliasson.car_auction_backend.models.Auction;
@@ -11,7 +9,6 @@ import com.williameliasson.car_auction_backend.models.User;
 import com.williameliasson.car_auction_backend.services.AuctionService;
 import com.williameliasson.car_auction_backend.services.AuthService;
 
-import com.williameliasson.car_auction_backend.services.BidService;
 import com.williameliasson.car_auction_backend.services.OpenAIService;
 import jakarta.validation.Valid;
 
