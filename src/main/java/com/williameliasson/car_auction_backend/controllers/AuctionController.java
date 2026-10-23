@@ -2,8 +2,6 @@ package com.williameliasson.car_auction_backend.controllers;
 
 import com.williameliasson.car_auction_backend.dtos.AuctionCreateRequest;
 import com.williameliasson.car_auction_backend.dtos.AuctionDisplay;
-import com.williameliasson.car_auction_backend.dtos.BidCreateRequest;
-import com.williameliasson.car_auction_backend.dtos.BidDisplay;
 import com.williameliasson.car_auction_backend.dtos.ValuationResult;
 import com.williameliasson.car_auction_backend.mappers.AuctionMapper;
 import com.williameliasson.car_auction_backend.models.Auction;
@@ -11,7 +9,6 @@ import com.williameliasson.car_auction_backend.models.User;
 import com.williameliasson.car_auction_backend.services.AuctionService;
 import com.williameliasson.car_auction_backend.services.AuthService;
 
-import com.williameliasson.car_auction_backend.services.BidService;
 import com.williameliasson.car_auction_backend.services.OpenAIService;
 import jakarta.validation.Valid;
 
@@ -34,16 +31,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RequestMapping("/auctions")
 public class AuctionController {
     private final AuctionMapper auctionMapper;
-    private final BidService bidService;
     private final OpenAIService openAIService;
     private final AuthService authService;
     private final AuctionService auctionService;
  
-    AuctionController(AuctionService auctionService, AuthService authService, OpenAIService openAIService, BidService bidService, AuctionMapper auctionMapper) {
+    AuctionController(AuctionService auctionService, AuthService authService, OpenAIService openAIService, AuctionMapper auctionMapper) {
         this.auctionService = auctionService;
         this.authService = authService;
         this.openAIService = openAIService;
-        this.bidService = bidService;
         this.auctionMapper = auctionMapper;
     }
     
@@ -91,18 +86,6 @@ public class AuctionController {
     public ResponseEntity<ValuationResult> getValuation(@PathVariable int id) {
         Auction auction = auctionService.getAuctionById(id);
         return ResponseEntity.ok().body(openAIService.getValuation(auction));
-    }
-    
-    @PostMapping("/{auctionId}/bids")
-    public ResponseEntity<BidDisplay> createBid(@PathVariable int auctionId, @RequestBody BidCreateRequest bidCreateRequest, Authentication authentication) {
-        try {
-            User user = authService.getUserByUsername(authentication.getName());
-            bidService.createBid(user, bidCreateRequest.amount(), auctionId);
-            return ResponseEntity.status(HttpStatus.CREATED).build();
-        } catch (Exception e){
-            System.err.println(e);
-            return ResponseEntity.badRequest().build();
-        }
     }
     
 

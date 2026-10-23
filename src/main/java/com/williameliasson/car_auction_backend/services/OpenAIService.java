@@ -67,7 +67,6 @@ public class OpenAIService {
                 
         // src: https://www.baeldung.com/spring-resttemplate-post-json
         ObjectMapper objectMapper = new ObjectMapper();
-        String requestString = objectMapper.writeValueAsString(request);
 
         HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(request);
                 

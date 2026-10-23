@@ -1,6 +1,6 @@
 package com.williameliasson.car_auction_backend.mappers;
 
-import com.williameliasson.car_auction_backend.services.BidService;
+import com.williameliasson.car_auction_backend.services.AuctionService;
 import org.springframework.stereotype.Component;
 
 import com.williameliasson.car_auction_backend.dtos.BidDisplay;
@@ -9,17 +9,17 @@ import com.williameliasson.car_auction_backend.models.Bid;
 @Component 
 public class BidMapper {
     
-    private final BidService bidService;
+    private final AuctionService auctionService;
 
-    BidMapper(BidService bidService){
-        this.bidService = bidService;
+    BidMapper(AuctionService auctionService){
+        this.auctionService = auctionService;
     }
 
     public BidDisplay toBidDisplay(Bid bid){
         return new BidDisplay(
             bid.getAuction().getId(),
             bid.getId(),
-            bidService.getBidderHash(bid),
+            auctionService.getBidderHash(bid),
             bid.getAmount()
         );
     }
