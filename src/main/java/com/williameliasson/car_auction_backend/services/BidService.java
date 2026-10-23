@@ -1,5 +1,6 @@
 package com.williameliasson.car_auction_backend.services;
 
+import com.williameliasson.car_auction_backend.mappers.BidMapper;
 import com.williameliasson.car_auction_backend.repositories.BidRepository;
 
 import jakarta.transaction.Transactional;
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import com.williameliasson.car_auction_backend.models.Auction;
@@ -19,12 +21,16 @@ import com.williameliasson.car_auction_backend.models.User;
 @Service 
 public class BidService {
     
+    private final BidMapper bidMapper;
+    private final SimpMessagingTemplate messagingTemplate;
     private final BidRepository bidRepository;
     private final AuctionService auctionService;
 
-    BidService(AuctionService auctionService, BidRepository bidRepository){
+    BidService(AuctionService auctionService, BidRepository bidRepository, SimpMessagingTemplate messagingTemplate, BidMapper bidMapper){
         this.auctionService = auctionService;
         this.bidRepository = bidRepository;
+        this.messagingTemplate = messagingTemplate;
+        this.bidMapper = bidMapper;
     }
 
     @Transactional 
@@ -77,6 +83,7 @@ public class BidService {
         bid.setAuction(auction);
         bid.setAmount(amount);
         bid.setCreatedAt(Instant.now());
+        broadcastNewBid(bid);
         bidRepository.save(bid);
     }
 
@@ -116,12 +123,7 @@ public class BidService {
         return user.getBalance() - lockedBalance;
     }
 
-    public String getBidderHash(Bid bid){
-        String auctionId = bid.getAuction().getId().toString();
-        String userId = bid.getUser().getId().toString();
-
-        // src: https://www.baeldung.com/java-objects-hash-vs-objects-hashcode
-        String hash = String.valueOf(Objects.hash(auctionId + "-" + userId));
-        return hash;
+    public void broadcastNewBid(Bid bid){
+        messagingTemplate.convertAndSend("/topic/auction/" + bid.getAuction().getId() + "/newBid", bidMapper.toBidDisplay(bid));
     }
 }

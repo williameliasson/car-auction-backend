@@ -1,6 +1,7 @@
 package com.williameliasson.car_auction_backend.models;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.Column;
@@ -59,7 +60,7 @@ public class Auction {
     private Integer valuationMax;
 
     @OneToMany(mappedBy = "auction")
-    private List<Bid> bids;
+    private List<Bid> bids = new ArrayList<>();
 
     @Column(nullable = false)
     private boolean winnerHasPaid;

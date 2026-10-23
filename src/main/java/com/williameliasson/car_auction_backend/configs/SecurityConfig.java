@@ -39,6 +39,7 @@ public class SecurityConfig {
                 .requestMatchers("/login", "/register").permitAll()
                 .requestMatchers("/auctions", "/auctions/*").permitAll()
                 .requestMatchers("/carmakes").permitAll()
+                .requestMatchers("/ws", "/ws/**").permitAll()
                 .anyRequest().authenticated())
             .userDetailsService(customUserDetailsService);
 

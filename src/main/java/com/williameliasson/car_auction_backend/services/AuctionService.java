@@ -10,6 +10,7 @@ import com.williameliasson.car_auction_backend.repositories.AuctionRepository;
 
 import com.williameliasson.car_auction_backend.repositories.CarMakeRepository;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -61,5 +62,14 @@ public class AuctionService {
             throw new IllegalArgumentException("Auction not found");
         }
         return maybeAuction.get();
+    }
+
+    public String getBidderHash(Bid bid){
+        String auctionId = bid.getAuction().getId().toString();
+        String userId = bid.getUser().getId().toString();
+
+        // src: https://www.baeldung.com/java-objects-hash-vs-objects-hashcode
+        String hash = String.valueOf(Objects.hash(auctionId + "-" + userId));
+        return hash;
     }
 }
