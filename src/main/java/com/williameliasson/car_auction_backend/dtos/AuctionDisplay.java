@@ -15,7 +15,8 @@ public record AuctionDisplay(
     Integer odometerKm,
     Integer valuationMin,
     Integer valuationMax,
-    boolean requestingUserIsOwner,
+    String ownerPseudonym,
+    String requestingUserPseudonym,
     List<BidDisplay> bids
 ) {
 }

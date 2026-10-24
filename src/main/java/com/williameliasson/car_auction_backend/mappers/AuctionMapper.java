@@ -1,5 +1,6 @@
 package com.williameliasson.car_auction_backend.mappers;
 
+import com.williameliasson.car_auction_backend.services.AuctionService;
 import org.springframework.stereotype.Component;
 
 import com.williameliasson.car_auction_backend.dtos.AuctionDisplay;
@@ -10,10 +11,12 @@ import com.williameliasson.car_auction_backend.models.User;
 @Component 
 public class AuctionMapper {
     
+    private final AuctionService auctionService;
     private final BidMapper bidMapper;
 
-    AuctionMapper(BidMapper bidMapper){
+    AuctionMapper(BidMapper bidMapper, AuctionService auctionService){
         this.bidMapper = bidMapper;
+        this.auctionService = auctionService;
     }
 
     public AuctionDisplay toAuctionDisplay(Auction auction, User user) {
@@ -29,7 +32,8 @@ public class AuctionMapper {
             auction.getOdometerKm(),
             auction.getValuationMin(),
             auction.getValuationMax(),
-            user == null ? false : auction.getOwner().equals(user), // if the user isnt logged in, default to showing it as not owned by the user. Otherwise, perform a check to see if the user is owner of this auction.
+            auctionService.getBidderHash(auction, auction.getOwner()),
+            user == null ? "" : auctionService.getBidderHash(auction, user),
             auction.getBids().stream().map(bid -> bidMapper.toBidDisplay(bid)).toList()
         );
 
