@@ -65,11 +65,15 @@ public class AuctionService {
     }
 
     public String getBidderHash(Bid bid){
-        String auctionId = bid.getAuction().getId().toString();
-        String userId = bid.getUser().getId().toString();
+        Auction auction = bid.getAuction();
+        User user = bid.getUser();
 
+        return getBidderHash(auction, user);
+    }
+    
+    public String getBidderHash(Auction auction, User user){
         // src: https://www.baeldung.com/java-objects-hash-vs-objects-hashcode
-        String hash = String.valueOf(Objects.hash(auctionId + "-" + userId));
+        String hash = String.valueOf(Objects.hash(auction.getId().toString() + "-" + user.getId().toString()));
         return hash;
     }
 }
