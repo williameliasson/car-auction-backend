@@ -9,6 +9,9 @@ import com.williameliasson.car_auction_backend.models.User;
 import com.williameliasson.car_auction_backend.repositories.AuctionRepository;
 
 import com.williameliasson.car_auction_backend.repositories.CarMakeRepository;
+
+import jakarta.transaction.Transactional;
+
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -17,14 +20,16 @@ import org.springframework.stereotype.Service;
 
 @Service 
 public class AuctionService {
+    private final BidService bidService;
     private final OpenAIService openAIService;
     private final CarMakeService carMakeService;
     private final AuctionRepository auctionRepository;
 
-    AuctionService(AuctionRepository auctionRepository, CarMakeRepository carMakeRepository, CarMakeService carMakeService, OpenAIService openAIService){
+    AuctionService(AuctionRepository auctionRepository, CarMakeRepository carMakeRepository, CarMakeService carMakeService, OpenAIService openAIService, BidService bidService){
         this.auctionRepository = auctionRepository;
         this.carMakeService = carMakeService;
         this.openAIService = openAIService;
+        this.bidService = bidService;
     }
 
     public Auction createAuction(User user, AuctionCreateRequest auctionCreateRequest){
@@ -77,16 +82,25 @@ public class AuctionService {
         return hash;
     }
 
+    @Transactional 
     public void endAuction(Auction auction){
         // check if winner has already paid, if not, continue
+        if (auction.isWinnerHasPaid()){
+            throw new IllegalArgumentException("Winner has already paid, cannot end auction");
+        }
 
         // get highest bid of the auction
+        Bid highestBid = bidService.getHighestBid(auction.getId()).orElseThrow(() -> new IllegalArgumentException("No bids when auction ended"));
+        User seller = auction.getOwner();
+        User buyer = highestBid.getUser();
 
         // subtract bid amount from bidder's balance
+        buyer.setBalance(buyer.getBalance() - highestBid.getAmount()); // should probably have a dedicated method for transfers
 
         // add bid amount to seller's balance
+        seller.setBalance(seller.getBalance() + highestBid.getAmount());
 
         // mark auction as paid
-
+        auction.setWinnerHasPaid(true);
     }
 }
