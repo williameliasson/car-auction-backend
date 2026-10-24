@@ -19,11 +19,26 @@ services:
       SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
       FRONTEND_URL: ${FRONTEND_URL}
+      DOMAIN: ${DOMAIN}
       SESSION_COOKIE_SECURE: ${SESSION_COOKIE_SECURE}
       OPENAI_KEY: ${OPENAI_KEY}
       OPENAI_URL: ${OPENAI_URL}
     depends_on:
       - postgres
+  # src: https://geekscircuit.com/simple-caddy-reverse-proxy-with-docker/
+  caddy:
+    image: caddy:2
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+    environment:
+      DOMAIN: ${DOMAIN}
+    # networks:
+    #   - web
+    depends_on:
+      - spring-boot
 
 volumes:
   postgres_data:
