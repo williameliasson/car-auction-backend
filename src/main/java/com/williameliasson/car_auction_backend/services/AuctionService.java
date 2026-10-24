@@ -10,26 +10,38 @@ import com.williameliasson.car_auction_backend.repositories.AuctionRepository;
 
 import com.williameliasson.car_auction_backend.repositories.CarMakeRepository;
 
+import com.williameliasson.car_auction_backend.repositories.UserRepository;
 import jakarta.transaction.Transactional;
 
+import java.time.Instant;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 @Service 
 public class AuctionService {
+    private final UserRepository userRepository;
     private final BidService bidService;
     private final OpenAIService openAIService;
     private final CarMakeService carMakeService;
     private final AuctionRepository auctionRepository;
 
-    AuctionService(AuctionRepository auctionRepository, CarMakeRepository carMakeRepository, CarMakeService carMakeService, OpenAIService openAIService, BidService bidService){
+    AuctionService(AuctionRepository auctionRepository, CarMakeRepository carMakeRepository, CarMakeService carMakeService, OpenAIService openAIService, BidService bidService, UserRepository userRepository){
         this.auctionRepository = auctionRepository;
         this.carMakeService = carMakeService;
         this.openAIService = openAIService;
         this.bidService = bidService;
+        this.userRepository = userRepository;
+    }
+
+    @Scheduled(fixedRate = 10_000)
+    public void endAuctionsPastDeadline(){
+        // get all where the winner has not paid yet, and the deadline is before now.
+        List<Auction> auctions = auctionRepository.findAllByDeadlineBeforeAndWinnerHasPaid(Instant.now(), false);
+        auctions.forEach(a -> endAuction(a));
+
     }
 
     public Auction createAuction(User user, AuctionCreateRequest auctionCreateRequest){
@@ -69,19 +81,6 @@ public class AuctionService {
         return maybeAuction.get();
     }
 
-    public String getBidderHash(Bid bid){
-        Auction auction = bid.getAuction();
-        User user = bid.getUser();
-
-        return getBidderHash(auction, user);
-    }
-    
-    public String getBidderHash(Auction auction, User user){
-        // src: https://www.baeldung.com/java-objects-hash-vs-objects-hashcode
-        String hash = String.valueOf(Objects.hash(auction.getId().toString() + "-" + user.getId().toString()));
-        return hash;
-    }
-
     @Transactional 
     public void endAuction(Auction auction){
         // check if winner has already paid, if not, continue
@@ -90,17 +89,25 @@ public class AuctionService {
         }
 
         // get highest bid of the auction
-        Bid highestBid = bidService.getHighestBid(auction.getId()).orElseThrow(() -> new IllegalArgumentException("No bids when auction ended"));
-        User seller = auction.getOwner();
-        User buyer = highestBid.getUser();
+        Optional<Bid> maybeHighestBid = bidService.getHighestBid(auction);
 
-        // subtract bid amount from bidder's balance
-        buyer.setBalance(buyer.getBalance() - highestBid.getAmount()); // should probably have a dedicated method for transfers
-
-        // add bid amount to seller's balance
-        seller.setBalance(seller.getBalance() + highestBid.getAmount());
+        // if there is at least one bid, do the transfer.
+        if (maybeHighestBid.isPresent()){
+            Bid highestBid = maybeHighestBid.get();
+            User seller = auction.getOwner();
+            User buyer = highestBid.getUser();
+    
+            // subtract bid amount from bidder's balance
+            buyer.setBalance(buyer.getBalance() - highestBid.getAmount()); // should probably have a dedicated method for transfers
+    
+            // add bid amount to seller's balance
+            seller.setBalance(seller.getBalance() + highestBid.getAmount());
+            userRepository.save(buyer);
+            userRepository.save(seller);
+        }
 
         // mark auction as paid
         auction.setWinnerHasPaid(true);
+        auctionRepository.save(auction);
     }
 }

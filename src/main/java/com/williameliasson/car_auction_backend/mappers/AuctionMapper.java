@@ -11,12 +11,10 @@ import com.williameliasson.car_auction_backend.models.User;
 @Component 
 public class AuctionMapper {
     
-    private final AuctionService auctionService;
     private final BidMapper bidMapper;
 
     AuctionMapper(BidMapper bidMapper, AuctionService auctionService){
         this.bidMapper = bidMapper;
-        this.auctionService = auctionService;
     }
 
     public AuctionDisplay toAuctionDisplay(Auction auction, User user) {
@@ -32,9 +30,13 @@ public class AuctionMapper {
             auction.getOdometerKm(),
             auction.getValuationMin(),
             auction.getValuationMax(),
-            auctionService.getBidderHash(auction, auction.getOwner()),
-            user == null ? "" : auctionService.getBidderHash(auction, user),
-            auction.getBids().stream().map(bid -> bidMapper.toBidDisplay(bid)).toList()
+            bidMapper.getBidderHash(auction, auction.getOwner()),
+            user == null ? "" : bidMapper.getBidderHash(auction, user),
+            auction.getBids().stream().map(
+                bid -> {
+                    return bidMapper.toBidDisplay(bid);
+                }
+            ).toList()
         );
 
     }
