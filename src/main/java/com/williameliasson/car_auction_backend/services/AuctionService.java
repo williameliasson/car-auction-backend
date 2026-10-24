@@ -76,4 +76,17 @@ public class AuctionService {
         String hash = String.valueOf(Objects.hash(auction.getId().toString() + "-" + user.getId().toString()));
         return hash;
     }
+
+    public void endAuction(Auction auction){
+        // check if winner has already paid, if not, continue
+
+        // get highest bid of the auction
+
+        // subtract bid amount from bidder's balance
+
+        // add bid amount to seller's balance
+
+        // mark auction as paid
+
+    }
 }
