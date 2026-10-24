@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.williameliasson.car_auction_backend.dtos.BidCreateRequest;
 import com.williameliasson.car_auction_backend.dtos.BidDisplay;
+import com.williameliasson.car_auction_backend.models.Auction;
 import com.williameliasson.car_auction_backend.models.Bid;
 import com.williameliasson.car_auction_backend.models.User;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,7 +41,8 @@ public class BidController {
     public ResponseEntity<BidDisplay> createBid(@PathVariable int auctionId, @RequestBody BidCreateRequest bidCreateRequest, Authentication authentication) {
         try {
             User user = authService.getUserByUsername(authentication.getName());
-            bidService.createBid(user, bidCreateRequest.amount(), auctionId);
+            Auction auction = auctionService.getAuctionById(auctionId);
+            bidService.createBid(user, bidCreateRequest.amount(), auction);
             return ResponseEntity.status(HttpStatus.CREATED).build();
         } catch (Exception e){
             System.err.println(e);

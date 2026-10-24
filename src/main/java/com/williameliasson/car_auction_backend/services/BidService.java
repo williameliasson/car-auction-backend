@@ -23,20 +23,17 @@ public class BidService {
     private final BidMapper bidMapper;
     private final SimpMessagingTemplate messagingTemplate;
     private final BidRepository bidRepository;
-    private final AuctionService auctionService;
 
-    BidService(AuctionService auctionService, BidRepository bidRepository, SimpMessagingTemplate messagingTemplate, BidMapper bidMapper){
-        this.auctionService = auctionService;
+    BidService(BidRepository bidRepository, SimpMessagingTemplate messagingTemplate, BidMapper bidMapper){
         this.bidRepository = bidRepository;
         this.messagingTemplate = messagingTemplate;
         this.bidMapper = bidMapper;
     }
 
     @Transactional 
-    public void createBid(User user, Integer amount, Integer auctionId){
+    public void createBid(User user, Integer amount, Auction auction){
         
-        Auction auction = auctionService.getAuctionById(auctionId);
-        Optional<Bid> highestBid = getHighestBid(auctionId);
+        Optional<Bid> highestBid = getHighestBid(auction);
         
         // Run all checks
 
@@ -86,9 +83,7 @@ public class BidService {
         bidRepository.save(bid);
     }
 
-    public Optional<Bid> getHighestBid(Integer auctionId){
-        Auction auction = auctionService.getAuctionById(auctionId);
-        
+    public Optional<Bid> getHighestBid(Auction auction){        
         // src: https://www.geeksforgeeks.org/java/stream-max-method-java-examples/
         // get highest bid
         Optional<Bid> highestBid = auction.getBids().stream()
@@ -103,7 +98,7 @@ public class BidService {
         bids = bids.stream()
             .filter(bid -> {
                 Auction auction = bid.getAuction();
-                Optional<Bid> highestBid = getHighestBid(auction.getId());
+                Optional<Bid> highestBid = getHighestBid(auction);
                 if (auction.isWinnerHasPaid() || // winner already paid
                     (highestBid.isPresent() && !highestBid.get().equals(bid) ) // a highest bid even exists AND this bid is not it
                     // auction.getDeadline().isBefore(Instant.now()) // past deadline
