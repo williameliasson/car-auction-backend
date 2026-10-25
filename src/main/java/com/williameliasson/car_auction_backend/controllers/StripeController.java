@@ -39,10 +39,12 @@ public class StripeController {
     }
 
     @PostMapping("/webhook")
-    public String webhook(String payload, @RequestHeader ("Stripe-Signature") String sigHeader) {
-        
-        return "";
+    public ResponseEntity<Void> webhook(String payload, @RequestHeader ("Stripe-Signature") String sigHeader) {
+        try {
+            stripeService.handleWebhook(payload, sigHeader);
+            return ResponseEntity.ok().build();
+        } catch (Exception e){
+            return ResponseEntity.badRequest().build();
+        }
     }
-    
-    
 }
