@@ -28,18 +28,22 @@ public class OrderService {
     }
 
     @Transactional 
-    public void createOrder(@Valid OrderCreateRequest orderCreateRequest){
+    public Order createOrder(Integer amountSek, User user){
         Order order = new Order();
-        User user = userRepository.findById(orderCreateRequest.userId()).orElseThrow(() -> new IllegalArgumentException("No user found"));
         
-        order.setAmountSek(orderCreateRequest.amountSek());
+        order.setAmountSek(amountSek);
         order.setUser(user);
         order.setPaid(false);
         
         orderRepository.save(order);
+        return order;
     }
 
     public List<Order> getOrdersByUser(User user){
         return orderRepository.findByUser(user);
+    }
+
+    public Order getOrderById(Integer id){
+        return orderRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("No order found"));
     }
 }
