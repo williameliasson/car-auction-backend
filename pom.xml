@@ -97,9 +97,9 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.stripe</groupId>
-			<artifactId>stripe-java</artifactId>
-			<version>4.2.0</version>
+            <groupId>com.stripe</groupId>
+            <artifactId>stripe-java</artifactId>
+            <version>31.4.1</version>
 		</dependency>
 	</dependencies>
 

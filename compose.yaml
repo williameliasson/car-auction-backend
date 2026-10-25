@@ -23,6 +23,9 @@ services:
       SESSION_COOKIE_SECURE: ${SESSION_COOKIE_SECURE}
       OPENAI_KEY: ${OPENAI_KEY}
       OPENAI_URL: ${OPENAI_URL}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET}
+      STRIPE_PUBLIC_KEY: "${STRIPE_PUBLIC_KEY}"
+      STRIPE_SECRET_KEY: "${STRIPE_SECRET_KEY}"
     depends_on:
       - postgres
   # src: https://geekscircuit.com/simple-caddy-reverse-proxy-with-docker/
