@@ -45,6 +45,7 @@ public class AuctionService {
 
     }
 
+    @Transactional 
     public Auction createAuction(User user, AuctionCreateRequest auctionCreateRequest){
         
         // Check validity of request
