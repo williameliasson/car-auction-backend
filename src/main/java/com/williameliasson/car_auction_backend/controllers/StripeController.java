@@ -34,16 +34,18 @@ public class StripeController {
             String checkoutUrl = stripeService.createCheckoutSession(order);
             return ResponseEntity.ok().body(new CheckoutResponse(checkoutUrl));
         } catch (Exception e){
+            System.err.println(e.getMessage());
             return ResponseEntity.badRequest().build();
         }
     }
 
     @PostMapping("/webhook")
-    public ResponseEntity<Void> webhook(String payload, @RequestHeader ("Stripe-Signature") String sigHeader) {
+    public ResponseEntity<Void> webhook(@RequestBody String payload, @RequestHeader ("Stripe-Signature") String sigHeader) {
         try {
             stripeService.handleWebhook(payload, sigHeader);
             return ResponseEntity.ok().build();
         } catch (Exception e){
+            System.err.println(e.getMessage());
             return ResponseEntity.badRequest().build();
         }
     }

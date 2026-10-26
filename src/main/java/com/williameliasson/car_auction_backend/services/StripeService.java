@@ -26,11 +26,12 @@ public class StripeService {
     private String frontendUrl;
 
     StripeService(OrderService orderService){
-        Stripe.apiKey = secretKey;
         this.orderService = orderService;
     }
-
+    
     public String createCheckoutSession(Order order) throws Exception{
+        Stripe.apiKey = secretKey;
+
         // make sure the is not already paid
         if (order.isPaid()){
             throw new IllegalArgumentException("Order is already paid for");
@@ -65,14 +66,14 @@ public class StripeService {
     public void handleWebhook(String payload, String sigHeader) throws Exception{
         Event event = Webhook.constructEvent(payload, sigHeader, webhookSecret);
 
-        if (event.getType() == "checkout.session.completed"){
+        if (event.getType().equals("checkout.session.completed")){
             Session session = (Session) event.getDataObjectDeserializer()
                 .getObject()
                 .orElseThrow(() -> new IllegalArgumentException("Could not deserialize event object"));
             
             String orderId = session.getClientReferenceId();
             Order order = orderService.getOrderById(Integer.valueOf(orderId));
-            order.setPaid(true);
+            orderService.markAsPaid(order);
         }
     }
 }

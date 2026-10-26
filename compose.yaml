@@ -24,7 +24,6 @@ services:
       OPENAI_KEY: ${OPENAI_KEY}
       OPENAI_URL: ${OPENAI_URL}
       STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET}
-      STRIPE_PUBLIC_KEY: "${STRIPE_PUBLIC_KEY}"
       STRIPE_SECRET_KEY: "${STRIPE_SECRET_KEY}"
     depends_on:
       - postgres

@@ -8,12 +8,10 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import com.williameliasson.car_auction_backend.dtos.OrderCreateRequest;
 import com.williameliasson.car_auction_backend.models.Order;
 import com.williameliasson.car_auction_backend.models.User;
 
 import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
 
 @Service 
 @Validated 
@@ -45,5 +43,17 @@ public class OrderService {
 
     public Order getOrderById(Integer id){
         return orderRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("No order found"));
+    }
+
+    @Transactional 
+    public void markAsPaid(Order order){
+        User user = order.getUser();
+        
+        user.setBalance(user.getBalance() + order.getAmountSek());
+        order.setPaid(true);
+        System.out.println("marking as paid order #" + order.getId().toString());
+        
+        userRepository.save(user);
+        orderRepository.save(order);
     }
 }

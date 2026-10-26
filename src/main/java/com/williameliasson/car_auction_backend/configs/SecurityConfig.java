@@ -40,6 +40,7 @@ public class SecurityConfig {
                 .requestMatchers("/auctions", "/auctions/*").permitAll()
                 .requestMatchers("/carmakes").permitAll()
                 .requestMatchers("/ws", "/ws/**").permitAll()
+                .requestMatchers("/stripe/webhook").permitAll()
                 .anyRequest().authenticated())
             .userDetailsService(customUserDetailsService);
 
