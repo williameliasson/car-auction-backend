@@ -12,6 +12,7 @@ import com.williameliasson.car_auction_backend.repositories.CarMakeRepository;
 
 import com.williameliasson.car_auction_backend.repositories.UserRepository;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Validator;
 
 import java.time.Instant;
 import java.util.List;
@@ -45,6 +46,15 @@ public class AuctionService {
     }
 
     public Auction createAuction(User user, AuctionCreateRequest auctionCreateRequest){
+        
+        // Check validity of request
+        if (auctionCreateRequest.title().isBlank()){
+            throw new IllegalArgumentException("Cannot have blank title on auction");
+        }
+        if (auctionCreateRequest.deadline().isBefore(Instant.now())){
+            throw new IllegalArgumentException("Cannot have deadline before now on new auction");
+        }
+
         Auction auction = new Auction();
         
         auction.setOwner(user);
