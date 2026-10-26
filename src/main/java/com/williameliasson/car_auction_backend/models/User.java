@@ -43,4 +43,8 @@ public class User {
     @OneToMany(mappedBy="user")
     private List<Bid> bids;
 
+    // Orders by the user (for auctioncredits)
+    @OneToMany(mappedBy = "user")
+    private List<Order> orders;
+
 }
