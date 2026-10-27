@@ -1,6 +1,7 @@
 package com.williameliasson.car_auction_backend;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
@@ -104,5 +105,40 @@ public class BidServiceTests {
         assertThrows(IllegalArgumentException.class, () -> {
             bidService.createBid(biddingUser, biddingUser.getBalance() + 1_000, auction);// try to create the new, second bid.
         }); 
+    }
+
+    @Test 
+    void shouldReturnHighestBid(){
+        //Arrange   
+
+        Auction auction = new Auction();
+        
+        // users
+        User lowbidder = new User();
+        lowbidder.setBalance(1_000);
+        
+        User highBidder = new User();
+        highBidder.setBalance(lowbidder.getBalance() + 1_000);
+
+        // bids by the users
+        Bid lowestBid = new Bid();
+        lowestBid.setAmount(lowbidder.getBalance());
+        lowestBid.setUser(lowbidder);
+        lowestBid.setAuction(auction);
+        
+        Bid highestBid = new Bid();
+        highestBid.setAmount(highBidder.getBalance());
+        highestBid.setUser(highBidder);
+        highestBid.setAuction(auction);
+
+        auction.getBids().add(lowestBid);
+        auction.getBids().add(highestBid);
+
+        //act
+        Bid returnedHighestBid = bidService.getHighestBid(auction).get();
+        
+        //assert
+        assertEquals(highestBid, returnedHighestBid);
+
     }
 }
