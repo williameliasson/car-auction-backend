@@ -80,6 +80,7 @@ public class BidService {
         bid.setAmount(amount);
         bid.setCreatedAt(Instant.now());
         broadcastNewBid(bid);
+        auction.getBids().add(bid);
         bidRepository.save(bid);
     }
 
