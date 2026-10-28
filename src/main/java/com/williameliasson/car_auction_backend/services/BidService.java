@@ -1,5 +1,6 @@
 package com.williameliasson.car_auction_backend.services;
 
+import com.williameliasson.car_auction_backend.exceptions.IllegalBidException;
 import com.williameliasson.car_auction_backend.mappers.BidMapper;
 import com.williameliasson.car_auction_backend.repositories.BidRepository;
 
@@ -39,38 +40,38 @@ public class BidService {
 
         // check if user is the owner of the auction
         if (auction.getOwner().equals(user)){
-            throw new IllegalArgumentException("Cannot bid on your own auction");
+            throw new IllegalBidException("BID_ON_OWN_AUCTION","Cannot bid on your own auction");
         }
 
         // check if auction is past deadline
         if (auction.getDeadline().isBefore(Instant.now())){
-            throw new IllegalArgumentException("Cannot bid on already finished auction");
+            throw new IllegalBidException("AUCTION_PAST_DEADLINE", "Cannot bid on already finished auction");
         }
 
         // if the auction is ended prematurely and winner pays, no bids should be able to be placed
         if (auction.isWinnerHasPaid()){
-            throw new IllegalArgumentException("Cannot bid on finished auction, winner has already paid");
+            throw new IllegalBidException( "AUCTION_PAID","Cannot bid on finished auction, winner has already paid");
         }
 
         // check the amount being positive nonzero
         if (amount <= 0){
-            throw new IllegalArgumentException("Bid amount must be greater than 0");
+            throw new IllegalBidException("NEGATIVE_BID","Bid amount must be greater than 0");
         }
 
         // check amount being greater than the current highest bid
         if (highestBid.isPresent() && amount <= highestBid.get().getAmount()){
-            throw new IllegalArgumentException("Bid amount must be larger than current highest bid");
+            throw new IllegalBidException("BID_LOWER_THAN_HIGHEST","Bid amount must be larger than current highest bid");
         }
 
         // check if user has available balance to the requested amount to bid
         if (getAvailableBalance(user) - amount < 0){
-            throw new IllegalArgumentException("Cannot bid more than your total available balance");
+            throw new IllegalBidException( "BID_LARGER_THAN_AVAILABLE_BALANCE","Cannot bid more than your total available balance");
         }
         
         // Unsure about this check. Having it included simplifies the situation where the user wants to outbid oneself,
         // as you would need to have a separate method for getting the available balance for each combination of user and auction.
         if (highestBid.isPresent() && highestBid.get().getUser().equals(user)){
-            throw new IllegalArgumentException("Cannot outbid yourself");
+            throw new IllegalBidException("OUTBID_SELF", "Cannot outbid yourself");
         }
 
         // Create the Bid object and persist it

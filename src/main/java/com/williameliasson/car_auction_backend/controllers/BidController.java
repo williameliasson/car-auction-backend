@@ -8,6 +8,7 @@ import com.williameliasson.car_auction_backend.services.BidService;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.williameliasson.car_auction_backend.dtos.BidCreateRequest;
 import com.williameliasson.car_auction_backend.dtos.BidDisplay;
+import com.williameliasson.car_auction_backend.exceptions.IllegalBidException;
 import com.williameliasson.car_auction_backend.models.Auction;
 import com.williameliasson.car_auction_backend.models.Bid;
 import com.williameliasson.car_auction_backend.models.User;
@@ -38,15 +40,17 @@ public class BidController {
     }
 
     @PostMapping("/auctions/{auctionId}/bids")
-    public ResponseEntity<BidDisplay> createBid(@PathVariable int auctionId, @RequestBody BidCreateRequest bidCreateRequest, Authentication authentication) {
+    public ResponseEntity<?> createBid(@PathVariable int auctionId, @RequestBody BidCreateRequest bidCreateRequest, Authentication authentication) {
         try {
             User user = authService.getUserByUsername(authentication.getName());
             Auction auction = auctionService.getAuctionById(auctionId);
             bidService.createBid(user, bidCreateRequest.amount(), auction);
             return ResponseEntity.status(HttpStatus.CREATED).build();
+        } catch (IllegalBidException e){
+            return ResponseEntity.badRequest().body(e.getErrorCode());
         } catch (Exception e){
             System.err.println(e);
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
 
