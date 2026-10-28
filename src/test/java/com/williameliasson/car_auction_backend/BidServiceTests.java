@@ -20,6 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import com.williameliasson.car_auction_backend.dtos.BidDisplay;
+import com.williameliasson.car_auction_backend.exceptions.IllegalBidException;
 import com.williameliasson.car_auction_backend.mappers.BidMapper;
 import com.williameliasson.car_auction_backend.models.Auction;
 import com.williameliasson.car_auction_backend.models.Bid;
@@ -102,7 +103,7 @@ public class BidServiceTests {
 
         // Act
         // Assert
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(IllegalBidException.class, () -> {
             bidService.createBid(biddingUser, biddingUser.getBalance() + 1_000, auction);// try to create the new, second bid.
         }); 
     }
