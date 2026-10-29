@@ -15,11 +15,15 @@ The bids are sent live to the client via websockets, to provide accurate and up 
 
 ## Installation
 1. Make sure [Docker](https://docs.docker.com/desktop/) is running.
-2. Open a terminal and navigate to the project root.
-3. Make a copy of `.env.example` called `.env.dev`.
-4. Populate the `.env.dev` file with your own secrets, such as API keys for OpenAI and Stripe, and the frontend URL.
-5. Run `docker compose --env-file .env.dev up --build;`.
-6. The application should now be running.
+2. Make sure you have [Stripe CLI](https://docs.stripe.com/cli/install) installed.
+3. Open a terminal and store your Stripe secret API key as an environment variable with `export STRIPE_SECRET_KEY=sk_test_...`.
+4. Use the same terminal and start Stripe CLI with `stripe listen --forward-to http://localhost:8080/stripe/webhook --api-key= $STRIPE_SECRET_KEY`. Leave this running.
+5. Open a new terminal and navigate to the project root.
+6. Make a copy of `.env.example` called `.env.dev`.
+7. Copy the webhook signing secret (`whsec_...`) from the output of step 4 into your `.env.dev` file.
+8. Populate the `.env.dev` file with the rest of your own secrets, such as API keys for OpenAI and Stripe, and the frontend URL.
+9. Run `docker compose --env-file .env.dev up --build;`.
+10. The application should now be running.
 
 ## Tech used
 * Java spring boot
