@@ -1,19 +1,17 @@
 services:
   postgres:
     image: postgres:18
+    restart: unless-stopped
     environment:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
-    ports:
-      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql
 
   spring-boot:
     build: .
-    ports:
-      - "8080:8080"
+    restart: unless-stopped
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${DB_NAME}
       SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
@@ -30,6 +28,7 @@ services:
   # src: https://geekscircuit.com/simple-caddy-reverse-proxy-with-docker/
   caddy:
     image: caddy:2
+    restart: unless-stopped
     ports:
       - "80:80"
       - "443:443"
